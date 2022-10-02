@@ -12,7 +12,7 @@ class spyss:
     - optimizing the structure (at fixed or variable lattice vectors)
     """
 
-    def __init__(self, cell, atoms, seed, count, optimizer):
+    def __init__(self, cell, atoms, seed, total_structures, optimizer):
         """
         Initializes a spyss object.
         """
@@ -20,16 +20,26 @@ class spyss:
         self.cell = cell
         self.atoms = atoms
         self.seed = seed
-        self.count = count
+        self.total_structures = total_structures
         self.optimizer = optimizer
 
+        self.count = 0 
         self.stochastic_cells = []
         self.stochastic_structures = []
         self.stochastic_metastable_structures = []
 
+
+    def update_count(self):
+        """
+        Keeps track of the number of generated structures.
+        """
+
+        self.count = len(self.stochastic_cells)
+
+
     def generate_stochastic_cell(self):
         """
-        Generates a stochastic cell using the spyss cell object.
+        Generates a cell with fixed or (stochastic) variable shape.
         """
 
         if self.cell.mode == "fixed-cell":
@@ -39,7 +49,22 @@ class spyss:
             raise NotImplementedError("Variable cell stochastic cell generation is not yet implemented.") 
        
         self.stochastic_cells.append(tmp_atoms)
+        self.update_count()
         del tmp_atoms
+
+
+    def generate_stochastic_structure(self):
+        """
+        Generates a structure with a stochasic cell and with  initial and 
+        stochastic atoms.
+        """
+
+        tmp_atoms = self.stochastic_cells[self.count - 1]
+        tmp_atoms += self.atoms.get_initial_atoms()
+        tmp_atoms += self.atoms.get_stochastic_atoms()
+        self.stochastic_structures.append(tmp_atoms)
+        del tmp_atoms
+
 
     def generate_metastable_structure():
         """

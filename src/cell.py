@@ -1,3 +1,4 @@
+import ase
 from ase.io import read
 
 class cell:
@@ -17,7 +18,9 @@ class cell:
         self.mode = mode
 
         with open(structure_file, 'r') as tmp_file:
-            self.structure = read(tmp_file)
+            tmp_atoms = read(tmp_file)
+            self.structure = ase.Atoms(cell=tmp_atoms.cell, pbc=tmp_atoms.pbc)
+            del tmp_atoms
 
         self.volume = self.structure.get_volume()
 
