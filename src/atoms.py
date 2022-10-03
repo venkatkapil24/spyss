@@ -2,6 +2,23 @@ import ase
 import numpy as np
 
 from ase.io import read
+from ase import neighborlist
+
+def check_for_overlap(atoms):
+    """
+    Reads an ASE-atoms object and determines if there are atoms that overlap.
+    """
+    
+    natural_cutoffs = np.asarray(neighborlist.natural_cutoffs(atoms)) * 0.25
+    neighbor_list_object = neighborlist.NeighborList(cutoffs=natural_cutoffs, self_interaction=False)
+    neighbor_list_object.update(atoms)
+    number_of_clashes = np.asarray([len(neighbor_list_object.get_neighbors(i)[0]) for i in range(len(atoms))]).sum()
+
+    if number_of_clashes > 0:
+        return True
+    else:
+        return False
+
 
 class stochastic_region:
     """
@@ -117,6 +134,7 @@ class atoms:
         self.number_of_stochastic_atoms = number_of_stochastic_atoms
         self.stochastic_region = stochastic_region
         self.seed = seed
+        self._max_iterations = 100
 
         with open(self.initial_atoms_file) as tmp_file:
             self.initial_atoms = read(tmp_file)
@@ -139,27 +157,37 @@ class atoms:
         Returns a single ASE atoms object with the stochastic atoms.
         """
 
-        self.stochastic_atoms = ase.Atoms()
-
-        for index in range(len(self.stochastic_atoms_list)):
+        i = 0
+        for x in range(self._max_iterations):
             
-            for index_stochastic_atoms in range(self.number_of_stochastic_atoms[index]):
+            self.stochastic_atoms = ase.Atoms()
 
-                stochastic_atoms = self.stochastic_atoms_list[index].copy()
-                # translates the centre of maass of the atoms
-                random_displacement = np.asarray([np.random.rand(), np.random.rand(), np.random.rand()])
-                random_displacement = self.stochastic_region.transformation_function(random_displacement)
-                stochastic_atoms.translate(random_displacement)
-                del random_displacement
+            for index in range(len(self.stochastic_atoms_list)):
 
-                # rotates the set of atoms about their centre-of-mass
-                random_angle = np.random.rand() * 180.0
-                random_direction = [np.random.rand(), np.random.rand(), np.random.rand()]
-                stochastic_atoms.rotate(random_angle, random_direction, center='COM')
-                del random_angle
-                del random_direction
+                for index_stochastic_atoms in range(self.number_of_stochastic_atoms[index]):
 
-                self.stochastic_atoms += stochastic_atoms.copy()
+                    stochastic_atoms = self.stochastic_atoms_list[index].copy()
+                    # translates the centre of maass of the atoms
+                    random_displacement = np.asarray([np.random.rand(), np.random.rand(), np.random.rand()])
+                    random_displacement = self.stochastic_region.transformation_function(random_displacement)
+                    stochastic_atoms.translate(random_displacement)
+                    del random_displacement
+
+                    # rotates the set of atoms about their centre-of-mass
+                    random_angle = np.random.rand() * 180.0
+                    random_direction = [np.random.rand(), np.random.rand(), np.random.rand()]
+                    stochastic_atoms.rotate(random_angle, random_direction, center='COM')
+                    del random_angle
+                    del random_direction
+
+                    self.stochastic_atoms += stochastic_atoms.copy()
+                    i += 1
+
+            if check_for_overlap(self.stochastic_atoms) is True:
+                continue
+            else:
+                print ('Generated structure(s) after', i, ' tries.')
+                break
 
         return self.stochastic_atoms.copy()
 
