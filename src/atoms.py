@@ -50,6 +50,7 @@ class stochastic_region:
 
             l = self.space_dict['cell_matrix'][i]
             lim = self.space_dict[il + '_limits']
+            #print ('il', r3[i], lim[1], lim[0], l)
             tmparray += (lim[0] + r3[i] * (lim[1] - lim[0])) * l
             del l, lim
 
@@ -168,14 +169,15 @@ class atoms:
                 for index_stochastic_atoms in range(self.number_of_stochastic_atoms[index]):
 
                     stochastic_atoms = self.stochastic_atoms_list[index].copy()
-                    # translates the centre of maass of the atoms
+                    # translates the centre of mass of the atoms
+                    stochastic_atoms.positions -= stochastic_atoms.get_center_of_mass()
                     random_displacement = np.asarray([np.random.rand(), np.random.rand(), np.random.rand()])
                     random_displacement = self.stochastic_region.transformation_function(random_displacement)
                     stochastic_atoms.translate(random_displacement)
                     del random_displacement
 
                     # rotates the set of atoms about their centre-of-mass
-                    random_angle = np.random.rand() * 180.0
+                    random_angle = np.random.rand() * 360.0
                     random_direction = [np.random.rand(), np.random.rand(), np.random.rand()]
                     stochastic_atoms.rotate(random_angle, random_direction, center='COM')
                     del random_angle

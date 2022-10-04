@@ -1,5 +1,6 @@
 import numpy as np
 from ase.io import read, write
+from ase.constraints import FixAtoms
 
 
 class spyss:
@@ -62,8 +63,24 @@ class spyss:
         self.stochastic_structures = self.stochastic_structures[0:self.count-1]
         tmp_atoms = self.stochastic_cells[self.count - 1].copy()
         tmp_atoms += self.atoms.get_initial_atoms()
+        
+        c = FixAtoms(indices=[atom.index for atom in tmp_atoms])
+        tmp_atoms.set_constraint(c)
+        
         tmp_atoms += self.atoms.get_stochastic_atoms()
         self.stochastic_structures.append(tmp_atoms)
+        del tmp_atoms
+
+        
+    def optimize_stochastic_structure(self):
+        """
+        Generates a structure with a stochasic cell and with  initial and 
+        stochastic atoms.
+        """
+
+        self.stochastic_metastable_structures = self.stochastic_metastable_structures[0:self.count-1]
+        tmp_atoms = self.optimizer.optimize(self.stochastic_structures[self.count - 1].copy())
+        self.stochastic_metastable_structures.append(tmp_atoms)
         del tmp_atoms
 
 
