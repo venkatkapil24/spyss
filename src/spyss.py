@@ -59,7 +59,8 @@ class spyss:
         stochastic atoms.
         """
 
-        tmp_atoms = self.stochastic_cells[self.count - 1]
+        self.stochastic_structures = self.stochastic_structures[0:self.count-1]
+        tmp_atoms = self.stochastic_cells[self.count - 1].copy()
         tmp_atoms += self.atoms.get_initial_atoms()
         tmp_atoms += self.atoms.get_stochastic_atoms()
         self.stochastic_structures.append(tmp_atoms)
