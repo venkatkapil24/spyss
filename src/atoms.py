@@ -4,15 +4,15 @@ import numpy as np
 from ase.io import read
 from ase import neighborlist
 
-def check_for_overlap(atoms):
+def check_for_overlap(atoms, cutoff_dict=None):
     """
     Reads an ASE-atoms object and determines if there are atoms that overlap.
     """
     
-    natural_cutoffs = np.asarray(neighborlist.natural_cutoffs(atoms)) * 0.25
-    neighbor_list_object = neighborlist.NeighborList(cutoffs=natural_cutoffs, self_interaction=False)
-    neighbor_list_object.update(atoms)
-    number_of_clashes = np.asarray([len(neighbor_list_object.get_neighbors(i)[0]) for i in range(len(atoms))]).sum()
+    if cutoff_dict is None:
+        cutoff_dict = np.asarray(neighborlist.natural_cutoffs(atoms)) * 0.5
+    
+    number_of_clashes = len(neighborlist.neighbor_list('i', atoms, cutoff=cutoff_dict))
 
     if number_of_clashes > 0:
         return True
@@ -124,7 +124,7 @@ class atoms:
     are to be added. 
     """
 
-    def __init__(self, initial_atoms_file, stochastic_atoms_files, number_of_stochastic_atoms, stochastic_region, seed):
+    def __init__(self, initial_atoms_file, stochastic_atoms_files, number_of_stochastic_atoms, stochastic_region, seed, cutoff_dict):
         """
         Initializes a spyss cell.
         """
@@ -134,7 +134,8 @@ class atoms:
         self.number_of_stochastic_atoms = number_of_stochastic_atoms
         self.stochastic_region = stochastic_region
         self.seed = seed
-        self._max_iterations = 100
+        self._max_iterations = 100000
+        self.cutoff_dict = cutoff_dict
 
         with open(self.initial_atoms_file) as tmp_file:
             self.initial_atoms = read(tmp_file)
@@ -183,7 +184,7 @@ class atoms:
                     self.stochastic_atoms += stochastic_atoms.copy()
                     i += 1
 
-            if check_for_overlap(self.stochastic_atoms) is True:
+            if check_for_overlap(self.stochastic_atoms, self.cutoff_dict) is True:
                 continue
             else:
                 print ('Generated structure(s) after', i, ' tries.')
