@@ -84,11 +84,20 @@ class spyss:
         del tmp_atoms
 
 
-    def generate_metastable_structure():
+    def generate_metastable_structure(self):
         """
         Generates a stochastic metastable structure for a given random seed.
         """
 
         self.generate_stochastic_cell()
         self.generate_stochastic_structure()
-        self.optimize_stochastoc_structure()
+        self.optimize_stochastic_structure()
+        
+        
+    def generate_all_metastable_structures(self):
+        """
+        Generates all stochastic metastable structures.
+        """
+
+        for index in range(self.total_structures):
+            self.generate_metastable_structure()
