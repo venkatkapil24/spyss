@@ -101,3 +101,14 @@ class spyss:
 
         for index in range(self.total_structures):
             self.generate_metastable_structure()
+            
+            
+    def sort_metastable_structures(self):
+        """
+        Sorts all stochastic metastable structures by energy.
+        """
+
+        tmparray = np.argsort([atoms.info['energy'] for atoms in self.stochastic_metastable_structures])
+        self.sorted_metastable_energies = [self.stochastic_metastable_structures[index].info['energy'] for index in tmparray]
+        self.sorted_metastable_structures = [self.stochastic_metastable_structures[index].copy() for index in tmparray]
+        

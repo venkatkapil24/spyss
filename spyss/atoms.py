@@ -2,23 +2,23 @@ import ase
 import numpy as np
 
 from ase.io import read
+from ase.build import make_supercell
 from ase import neighborlist
 
 def check_for_overlap(atoms, cutoff_dict=None):
     """
     Reads an ASE-atoms object and determines if there are atoms that overlap.
     """
-    
+
     if cutoff_dict is None:
         cutoff_dict = np.asarray(neighborlist.natural_cutoffs(atoms)) * 0.5
-    
+
     number_of_clashes = len(neighborlist.neighbor_list('i', atoms, cutoff=cutoff_dict))
 
     if number_of_clashes > 0:
         return True
     else:
         return False
-
 
 class stochastic_region:
     """
@@ -39,6 +39,24 @@ class stochastic_region:
         self.read_space_dict()
 
 
+    def _ufunc_transformation_cuboidal(self, r3):
+        """"
+        Transforms a randfom number in [0,1]^3 to a cuboidal region.
+        """
+
+        tmparray = np.zeros(3)
+
+        for i, il  in zip(range(3), ['A', 'B', 'C']):
+
+            l = self.space_dict['cell_matrix'][i]
+            lim = self.space_dict[il + '_limits']
+            #print ('il', r3[i], lim[1], lim[0], l)
+            tmparray += (lim[0] + r3[i] * (lim[1] - lim[0])) * l
+            del l, lim
+
+        return tmparray
+    
+    
     def _ufunc_transformation_cuboidal(self, r3):
         """"
         Transforms a randfom number in [0,1]^3 to a cuboidal region.
@@ -83,7 +101,7 @@ class stochastic_region:
             # Reads the cell matrix
             try:
                 with open(self.space_dict['cell_file'], 'r') as tmpfile:
-                    self.space_dict['cell_matrix'] = np.asarray(read(tmpfile).cell)
+                    self.space_dict['cell_matrix'] = np.asarray(make_supercell(read(tmpfile), self.space_dict['P']).cell)
             except:
                 raise ValueError('key: cell_file not found in space_dict.')
 
@@ -125,12 +143,13 @@ class atoms:
     are to be added. 
     """
 
-    def __init__(self, initial_atoms_file, stochastic_atoms_files, number_of_stochastic_atoms, stochastic_region, seed, cutoff_dict):
+    def __init__(self, initial_atoms_file, initial_atoms_P, stochastic_atoms_files, number_of_stochastic_atoms, stochastic_region, seed, cutoff_dict):
         """
         Initializes a spyss cell.
         """
 
         self.initial_atoms_file = initial_atoms_file
+        self.initial_atoms_P = initial_atoms_P
         self.stochastic_atoms_files = stochastic_atoms_files
         self.number_of_stochastic_atoms = number_of_stochastic_atoms
         self.stochastic_region = stochastic_region
@@ -139,7 +158,7 @@ class atoms:
         self.cutoff_dict = cutoff_dict
 
         with open(self.initial_atoms_file) as tmp_file:
-            self.initial_atoms = read(tmp_file)
+            self.initial_atoms = make_supercell(read(tmp_file), self.initial_atoms_P)
 
         self.stochastic_atoms_list = []
         for stochastic_atoms_file in stochastic_atoms_files:

@@ -36,6 +36,7 @@ class optimizer:
         
         tmpobject = self._implemented_optimization_algorithms[self.optimization_algorithm](tmpatoms)
         tmpobject.run(**self.optimization_parameter_dict)       
+        tmpatoms.info['energy'] = tmpatoms.get_potential_energy()
         del tmpobject
         
         return tmpatoms.copy()
