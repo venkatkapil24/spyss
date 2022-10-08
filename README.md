@@ -6,4 +6,4 @@ This is a Python implementation of the simple, elegant and powerful approach to 
 
 Install SpySS by PIP:
 
-    pip install git+https://github.com/xradvincula/spyss.git
+    pip install git+https://github.com/xradvincula/spyss.git@main
