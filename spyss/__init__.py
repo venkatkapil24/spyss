@@ -66,14 +66,25 @@ class spyss:
         """
 
         self.stochastic_structures = self.stochastic_structures[0:self.count-1]
+        
         tmp_atoms = self.stochastic_cells[self.count - 1].copy()
-        tmp_atoms += self.atoms.get_initial_atoms()
         
-        c = FixAtoms(indices=[atom.index for atom in tmp_atoms])
-        tmp_atoms.set_constraint(c)
+        # Checks if initial_atoms exist
+        # If yes, adds them to the structure
+        # and fixes all the initial_atoms
         
-        tmp_atoms += self.atoms.get_stochastic_atoms()
-        self.stochastic_structures.append(tmp_atoms)
+        if self.atoms.initial_atoms is not None: 
+            tmp_atoms += self.atoms.get_initial_atoms()
+            c = FixAtoms(indices=[atom.index for atom in tmp_atoms])
+            tmp_atoms.set_constraint(c)
+    
+        # Checks if stochastic_atoms exist
+        # If yes, adds them to the structure
+        
+        if len(self.atoms.stochastic_atoms_list) !=0:
+            tmp_atoms += self.atoms.get_stochastic_atoms()
+            self.stochastic_structures.append(tmp_atoms)
+        
         del tmp_atoms
 
         

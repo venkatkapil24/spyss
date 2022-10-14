@@ -136,16 +136,16 @@ class stochastic_region:
 
 class atoms:
     """
-    A sypyss atoms object is described by an ASE atoms object 
+    ! A sypyss atoms object is described by an ASE atoms object 
     of initial atoms, a list of ASE atoms objects of stochastic 
     atoms, and a list of the number of individual stochastic atoms, 
     a random number seed, and the region where stochastic atoms 
     are to be added. 
     """
 
-    def __init__(self, initial_atoms_file, initial_atoms_P, stochastic_atoms_files, number_of_stochastic_atoms, stochastic_region, seed, cutoff_dict):
+    def __init__(self, initial_atoms_file=None, initial_atoms_P=np.eye(3), stochastic_atoms_files=[], number_of_stochastic_atoms=0, stochastic_region='slab', seed=0, cutoff_dict=None):
         """
-        Initializes a spyss cell.
+        ! Initializes a spyss cell.
         """
 
         self.initial_atoms_file = initial_atoms_file
@@ -157,13 +157,17 @@ class atoms:
         self._max_iterations = 100000
         self.cutoff_dict = cutoff_dict
 
-        with open(self.initial_atoms_file) as tmp_file:
-            self.initial_atoms = make_supercell(read(tmp_file), self.initial_atoms_P)
+        if self.initial_atoms_file is not None:
+            with open(self.initial_atoms_file) as tmp_file:
+                self.initial_atoms = make_supercell(read(tmp_file), self.initial_atoms_P)
+        else:
+            self.initial_atoms = None
 
-        self.stochastic_atoms_list = []
-        for stochastic_atoms_file in stochastic_atoms_files:
-            with open(stochastic_atoms_file) as tmp_file:
-                self.stochastic_atoms_list.append(read(tmp_file))
+        if len(self.stochastic_atoms_files) != 0:
+            self.stochastic_atoms_list = []
+            for stochastic_atoms_file in stochastic_atoms_files:
+                with open(stochastic_atoms_file) as tmp_file:
+                    self.stochastic_atoms_list.append(read(tmp_file))
 
     def get_initial_atoms(self):
         """
