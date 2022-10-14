@@ -15,7 +15,12 @@ class spyss:
 
     def __init__(self, cell, atoms, seed, total_structures, optimizer):
         """
-        Initializes a spyss object.
+        ! Initializes a spyss object.
+        @param cell The name of the spyss cell object.
+        @param atoms The name of the spyss atoms object.
+        @param seed The random number seed to reproduce structures.
+        @param total_structures The total number of structures to be generated.
+        @param optimizer The name of the spyss optimizer object.
         """
 
         self.cell = cell
@@ -32,7 +37,7 @@ class spyss:
 
     def update_count(self):
         """
-        Keeps track of the number of generated structures.
+        ! Keeps track of the number of generated structures.
         """
 
         self.count = len(self.stochastic_cells)
@@ -40,7 +45,7 @@ class spyss:
 
     def generate_stochastic_cell(self):
         """
-        Generates a cell with fixed or (stochastic) variable shape.
+        ! Generates a cell with fixed or (stochastic) variable shape.
         """
 
         if self.cell.mode == "fixed-cell":
@@ -56,7 +61,7 @@ class spyss:
 
     def generate_stochastic_structure(self):
         """
-        Generates a structure with a stochasic cell and with  initial and 
+        ! Generates a structure with a stochasic cell and with  initial and 
         stochastic atoms.
         """
 
@@ -74,7 +79,7 @@ class spyss:
         
     def optimize_stochastic_structure(self):
         """
-        Generates a structure with a stochasic cell and with  initial and 
+        ! Generates a structure with a stochasic cell and with  initial and 
         stochastic atoms.
         """
 
@@ -86,7 +91,7 @@ class spyss:
 
     def generate_metastable_structure(self):
         """
-        Generates a stochastic metastable structure for a given random seed.
+        ! Generates a stochastic metastable structure for a given random seed.
         """
 
         self.generate_stochastic_cell()
@@ -96,7 +101,7 @@ class spyss:
         
     def generate_all_metastable_structures(self):
         """
-        Generates all stochastic metastable structures.
+        ! Generates all stochastic metastable structures.
         """
 
         for index in range(self.total_structures):
@@ -105,7 +110,7 @@ class spyss:
             
     def sort_metastable_structures(self):
         """
-        Sorts all stochastic metastable structures by energy.
+        ! Sorts all stochastic metastable structures by energy.
         """
 
         tmparray = np.argsort([atoms.info['energy'] for atoms in self.stochastic_metastable_structures])
