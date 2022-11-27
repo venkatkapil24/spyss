@@ -10,20 +10,14 @@ class cell:
     number seed.
     """
 
-    def __init__(self, structure_file, P, mode):
+    def __init__(self, ase_atoms, P, mode):
         """
         Initializes a spyss cell.
         """
 
-        self.structure_file = structure_file
+        self.ase_atoms = ase_atoms
         self.P = P
         self.mode = mode
-
-        with open(structure_file, 'r') as tmp_file:
-            tmp_atoms = read(tmp_file)
-            self.structure = ase.Atoms(cell=tmp_atoms.cell, pbc=tmp_atoms.pbc)
-            self.structure = make_supercell(self.structure, P)
-            del tmp_atoms
-
-        self.volume = self.structure.get_volume()
+        
+        self.volume = self.ase_atoms.get_volume()
 

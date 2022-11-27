@@ -143,31 +143,19 @@ class atoms:
     are to be added. 
     """
 
-    def __init__(self, initial_atoms_file=None, initial_atoms_P=np.eye(3), stochastic_atoms_files=[], number_of_stochastic_atoms=0, stochastic_region='slab', seed=0, cutoff_dict=None):
+    def __init__(self, initial_atoms=None, initial_atoms_P=np.eye(3), stochastic_atoms=[], number_of_stochastic_atoms=0, stochastic_region='slab', seed=0, cutoff_dict=None):
         """
         ! Initializes a spyss cell.
         """
 
-        self.initial_atoms_file = initial_atoms_file
+        self.initial_atoms = initial_atoms
         self.initial_atoms_P = initial_atoms_P
-        self.stochastic_atoms_files = stochastic_atoms_files
+        self.stochastic_atomss = stochastic_atoms
         self.number_of_stochastic_atoms = number_of_stochastic_atoms
         self.stochastic_region = stochastic_region
         self.seed = seed
         self._max_iterations = 100000
         self.cutoff_dict = cutoff_dict
-
-        if self.initial_atoms_file is not None:
-            with open(self.initial_atoms_file) as tmp_file:
-                self.initial_atoms = make_supercell(read(tmp_file), self.initial_atoms_P)
-        else:
-            self.initial_atoms = None
-
-        if len(self.stochastic_atoms_files) != 0:
-            self.stochastic_atoms_list = []
-            for stochastic_atoms_file in stochastic_atoms_files:
-                with open(stochastic_atoms_file) as tmp_file:
-                    self.stochastic_atoms_list.append(read(tmp_file))
 
     def get_initial_atoms(self):
         """
@@ -204,7 +192,7 @@ class atoms:
                     random_direction = [np.random.rand(), np.random.rand(), np.random.rand()]
                     stochastic_atoms.rotate(random_angle, random_direction, center='COM')
                     del random_angle
-                    del random_direction
+                    del random_din
 
                     self.stochastic_atoms += stochastic_atoms.copy()
                     i += 1
