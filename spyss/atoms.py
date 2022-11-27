@@ -84,12 +84,7 @@ class stochastic_region:
 
             self.transformation_function = self._ufunc_transformation_cuboidal
 
-            try:
-                with open(self.space_dict['cell_file'], 'r') as tmpfile:
-                    self.space_dict['cell_matrix'] = np.asarray(read(tmpfile).cell)
-            except:
-                raise ValueError('key: cell_file not found in space_dict.')
-
+            self.space_dict['cell_matrix'] = self.space_dict['cell_matrix']
             self.space_dict['A_limits'] = [0, 1]
             self.space_dict['B_limits'] = [0, 1]
             self.space_dict['C_limits'] = [0, 1]
@@ -98,12 +93,7 @@ class stochastic_region:
             
             self.transformation_function = self._ufunc_transformation_cuboidal
 
-            # Reads the cell matrix
-            try:
-                with open(self.space_dict['cell_file'], 'r') as tmpfile:
-                    self.space_dict['cell_matrix'] = np.asarray(make_supercell(read(tmpfile), self.space_dict['P']).cell)
-            except:
-                raise ValueError('key: cell_file not found in space_dict.')
+            self.space_dict['cell_matrix'] = self.space_dict['cell_matrix']
 
             # Checks if the bounds for the A,B or C cell vector are valid
             for l in ['A', 'B', 'C']:
